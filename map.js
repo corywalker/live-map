@@ -1,4 +1,4 @@
-var d3;
+/*var d3;
 d3 || (d3 = {});
 (function () {
     function h(a, b) {
@@ -485,7 +485,7 @@ d3 || (d3 = {});
         }, a
     };
     d3.geo.greatCircle = d3.geo.circle
-})();
+})();*/
 var HomepageMap = {
     options: {
         plotInterval: 250,
@@ -495,13 +495,27 @@ var HomepageMap = {
     nowShowing: null,
     highlightLoop: 0,
     initialize: function () {
-        var scale = 1050,
-            point = [630, 260];
-        $("body").hasClass("standalone") && (scale = 1920, point = [900, 470]);
-        this.projection = d3.geo.mercator().scale(scale).translate(point);
-        $("body").hasClass("standalone") && d3.json("/j/carbon-world.json", function (data) {
-            d3.select("svg.world").selectAll("path").data(data.features).enter().append("path").attr("d", d3.geo.path().projection(d3.geo.mercator().scale(scale).translate(point)))
-        });
+        var scale = 1050, point = [630, 260];
+        var standalone = $("body").hasClass("standalone");
+        //standalone = true;
+        if (standalone)
+            scale = 1920, point = [900, 470]
+        //this.projection = d3.geo.mercator().scale(scale).translate(point);
+        this.projection = d3.geo.mercator();
+        if (standalone) {
+            d3.json("carbon-world.json", function (data) {
+                d3.select("svg.world")
+                    .selectAll("path")
+                    .data(data.features)
+                    .enter()
+                    .append("path")
+                    .attr("d",
+                        d3.geo.path().projection(
+                            d3.geo.mercator().scale(scale).translate(point)
+                        )
+                    )
+            });
+        }
         this.options.world_mode = true;
         this.refreshData();
         var hover = $("body").hasClass("mobile") ? "touchstart" : "mouseenter",
