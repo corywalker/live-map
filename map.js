@@ -569,34 +569,34 @@ var HomepageMap = {
                 (this.plotActivity(next), this.items.push(next));
         }
     },
-    plotActivity: function (h) {
-        var p =
-            this.projection([h.longitude, h.latitude]),
-            r = {
-                setname: h.set,
-                location: h.location
+    plotActivity: function (act) {
+        var projected =
+            this.projection([act.longitude, act.latitude]),
+            toSub = {
+                setname: act.set,
+                location: act.location
             };
-        500 < p[0] && (r.extraClasses = "flipped");
-        var s = $($.trim(this.sessionHtml).substitute(r)).css({
-            left: Math.round(p[0] + 2 * (Math.random() - 0.5) - 2),
-            top: Math.round(p[1] + 2 * (Math.random() - 0.5) - 2)
+        if (500 < projected[0])
+            toSub.extraClasses = "flipped";
+        var rendered = $($.trim(this.sessionHtml).substitute(toSub)).css({
+            left: Math.round(projected[0] + 2 * (Math.random() - 0.5) - 2),
+            top: Math.round(projected[1] + 2 * (Math.random() - 0.5) - 2)
         });
-        s.appendTo("#map-sessions");
-        s.data("item", h);
+        rendered.appendTo("#map-sessions");
+        rendered.data("item", act);
         setTimeout(function () {
-            s.children(".blip").removeClass("new")
+            rendered.children(".blip").removeClass("new")
         }, 10);
-        var t = function (h) {
-            !h.hasClass("retain") && !h.parent(".session").hasClass("showing") ? (h.addClass("remove"), setTimeout(function () {
-                h.parents(".session").remove()
-            }.bind(h),
-                1700)) : setTimeout(function () {
-                t(h)
-            }, 4E3)
+        var t = function (blip) {
+            var bla = !blip.hasClass("retain") && !blip.parent(".session").hasClass("showing")
+            bla ? (blip.addClass("remove"), setTimeout(function () {
+                blip.parents(".session").remove()
+            }.bind(blip),
+                1700)) : setTimeout(function () {t(blip)}, 4E3)
         };
         setTimeout(function () {
-            var h = s.children(".blip");
-            t(h)
+            var blip = rendered.children(".blip");
+            t(blip)
         }, this.options.modeRemovalTime)
     },
     pause: function () {
