@@ -495,25 +495,25 @@ var HomepageMap = {
     nowShowing: null,
     highlightLoop: 0,
     initialize: function () {
-        var h = 1050,
-            p = [630, 260];
-        $("body").hasClass("standalone") && (h = 1920, p = [900, 470]);
-        this.projection = d3.geo.mercator().scale(h).translate(p);
-        $("body").hasClass("standalone") && d3.json("/j/carbon-world.json", function (r) {
-            d3.select("svg.world").selectAll("path").data(r.features).enter().append("path").attr("d", d3.geo.path().projection(d3.geo.mercator().scale(h).translate(p)))
+        var scale = 1050,
+            point = [630, 260];
+        $("body").hasClass("standalone") && (scale = 1920, point = [900, 470]);
+        this.projection = d3.geo.mercator().scale(scale).translate(point);
+        $("body").hasClass("standalone") && d3.json("/j/carbon-world.json", function (data) {
+            d3.select("svg.world").selectAll("path").data(data.features).enter().append("path").attr("d", d3.geo.path().projection(d3.geo.mercator().scale(scale).translate(point)))
         });
-        this.options.world_mode = !0;
+        this.options.world_mode = true;
         this.refreshData();
-        var r = $("body").hasClass("mobile") ? "touchstart" : "mouseenter",
-            s = $("body").hasClass("mobile") ? "touchend" : "mouseleave",
+        var hover = $("body").hasClass("mobile") ? "touchstart" : "mouseenter",
+            leavehover = $("body").hasClass("mobile") ? "touchend" : "mouseleave",
             t = this;
-        $("#map-sessions").on(r, ".blip", function () {
-            t.unhighlight();
-            t.stopHighlighting();
+        $("#map-sessions").on(hover, ".blip", function () {
+            this.unhighlight();
+            this.stopHighlighting();
             $(this).addClass("retain");
             $(this).parents(".session").addClass("touching")
-        }).on(s, ".blip", function () {
-            t.startHighlighting(600);
+        }).on(leavehover, ".blip", function () {
+            this.startHighlighting(600);
             $(this).removeClass("retain");
             $(this).parents(".session").removeClass("touching")
         })
@@ -529,16 +529,21 @@ var HomepageMap = {
             success: function (data) {
                 this.items = data.items;
                 this.totalItems = this.items.length;
-                this.plotLoop = setInterval(this.plotNextItem.bind(this), this.options.plotInterval);
+                this.plotLoop = setInterval(
+                    this.plotNextItem.bind(this),
+                    this.options.plotInterval
+                );
                 this.startHighlighting(4 * this.options.plotInterval)
             }.bind(this)
         })
     },
-    startHighlighting: function (h) {
+    startHighlighting: function (timeout) {
         this.highlightLoop = setTimeout(function () {
             this.highlightRandomSession();
-            this.highlightLoop = setInterval(this.highlightRandomSession.bind(this), this.options.highlightInterval)
-        }.bind(this), h)
+            this.highlightLoop = setInterval(
+                this.highlightRandomSession.bind(this),
+                this.options.highlightInterval)
+        }.bind(this), timeout)
     },
     stopHighlighting: function () {
         clearInterval(this.highlightLoop);
@@ -547,8 +552,8 @@ var HomepageMap = {
     highlightRandomSession: function () {
         if (!this.paused) {
             this.unhighlight();
-            var h = $("#map-sessions .session").not(".showing").not(".remove");
-            this.nowShowing = $(h.toArray().getRandom()).addClass("showing")
+            var eligSessions = $("#map-sessions .session").not(".showing").not(".remove");
+            this.nowShowing = $(eligSessions.toArray().getRandom()).addClass("showing")
         }
     },
     unhighlight: function () {
@@ -556,8 +561,12 @@ var HomepageMap = {
     },
     plotNextItem: function () {
         if (!this.paused) {
-            var h = this.items.shift();
-            0 == h.longitude && 0 == h.latitude || !h.location ? this.plotNextItem() : (this.plotActivity(h), this.items.push(h))
+            var next = this.items.shift();
+            var uneligible = 0 == next.longitude && 0 == next.latitude || !next.location;
+            if (uneligible)
+                this.plotNextItem();
+            else
+                (this.plotActivity(next), this.items.push(next));
         }
     },
     plotActivity: function (h) {
@@ -591,10 +600,10 @@ var HomepageMap = {
         }, this.options.modeRemovalTime)
     },
     pause: function () {
-        this.paused = !0
+        this.paused = true
     },
     unpause: function () {
-        this.paused = !1
+        this.paused = false
     },
     sessionHtml: '\t\t<div class="session {extraClasses}">\t\t\t<div class="new blip"></div>\t\t\t<div class="label">\t\t\t\t<div class="setname">{setname}</div>\t\t\t\t<div class="location">{location}</div>\t\t\t\t<span class="arrow"></span>\t\t\t</div>\t\t</div>\t'
 };
