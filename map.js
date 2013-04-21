@@ -587,16 +587,20 @@ var HomepageMap = {
         setTimeout(function () {
             rendered.children(".blip").removeClass("new")
         }, 10);
-        var t = function (blip) {
-            var bla = !blip.hasClass("retain") && !blip.parent(".session").hasClass("showing")
-            bla ? (blip.addClass("remove"), setTimeout(function () {
-                blip.parents(".session").remove()
-            }.bind(blip),
-                1700)) : setTimeout(function () {t(blip)}, 4E3)
+        var tryToRemove = function (blip) {
+            var dontWait = !blip.hasClass("retain") && !blip.parent(".session").hasClass("showing")
+            if (dontWait) {
+                blip.addClass("remove");
+                setTimeout(function () {
+                    blip.parents(".session").remove()
+                }.bind(blip), 1700);
+            } else {
+                setTimeout(function () {tryToRemove(blip)}, 4000)
+            }
         };
         setTimeout(function () {
             var blip = rendered.children(".blip");
-            t(blip)
+            tryToRemove(blip)
         }, this.options.modeRemovalTime)
     },
     pause: function () {
