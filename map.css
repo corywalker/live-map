@@ -14,21 +14,15 @@ body { margin: 0px; padding: 0px; }
     user-select: none;
 }
 
-.map .projection {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 1400px;
-    height: 480px;
+.land {
+  /*fill: #d86940;*/
+  fill: #87b43f;
 }
 
-.map .projection path {
-    fill: #f4f0ea;
-    fill: #1f6fd9;
-    stroke: #fff;
-    stroke-opacity: 0.4;
-    stroke-opacity: 1;
-    stroke-width: 0.7px;
+.boundary {
+  fill: none;
+  stroke: #fff;
+  stroke-width: .5px;
 }
 
 .map .sessions .session {

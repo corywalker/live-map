@@ -1,13 +1,12 @@
 var HomepageMap = {
     options: {
         plotInterval: 250,
-        highlightInterval: 2E3,
-        modeRemovalTime: 15E3
+        highlightInterval: 2000,
+        modeRemovalTime: 15000
     },
     nowShowing: null,
     highlightLoop: 0,
     initialize: function () {
-
         var width = 960,
             height = 960;
 
@@ -16,11 +15,31 @@ var HomepageMap = {
             .translate([width / 2, height / 2])
             .precision(.1);
 
+        var path = d3.geo.path()
+            .projection(this.projection);
+
+        var svg = d3.select("body").append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        d3.json("world-50m.json", function(error, world) {
+          svg.insert("path")
+              .datum(topojson.object(world, world.objects.land))
+              .attr("class", "land")
+              .attr("d", path);
+
+          svg.insert("path")
+              .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
+              .attr("class", "boundary")
+              .attr("d", path);
+        });
+
+        d3.select(self.frameElement).style("height", height + "px");
+
         this.options.world_mode = true;
         this.refreshData();
         var hover = $("body").hasClass("mobile") ? "touchstart" : "mouseenter",
-            leavehover = $("body").hasClass("mobile") ? "touchend" : "mouseleave",
-            t = this;
+            leavehover = $("body").hasClass("mobile") ? "touchend" : "mouseleave";
         $("#map-sessions").on(hover, ".blip", function () {
             this.unhighlight();
             this.stopHighlighting();
@@ -138,11 +157,3 @@ var HomepageMap = {
     },
     sessionHtml: '\t\t<div class="session {extraClasses}">\t\t\t<div class="new blip"></div>\t\t\t<div class="label">\t\t\t\t<div class="setname">{setname}</div>\t\t\t\t<div class="location">{location}</div>\t\t\t\t<span class="arrow"></span>\t\t\t</div>\t\t</div>\t'
 };
-
-QWait("dom", function () {
-    QLoad("homepage_map")
-});
-
-QWait("dom", function () {
-    QLoad("homepage")
-});

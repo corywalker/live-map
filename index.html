@@ -1,110 +1,20 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
    "http://www.w3.org/TR/html4/strict.dtd">
+
 <html>
     <head>
         <link rel='stylesheet' type='text/css' href='map.css'>
-
-        <style>
-        .land {
-          fill: #27D;
-        }
-
-        .boundary {
-          fill: none;
-          stroke: #fff;
-          stroke-width: .5px;
-        }
-        </style>
-
-        <script type='text/javascript'>
-            var QWait, QLoad;
-            (function () {
-                var c = [],
-                    g = {}, h = 0,
-                    f = function (b, a, c, d) {
-                        6 > h++ && ((new Image).src = "/ajax/jserror.php?title=" + (d || "preload_js_error") + "&data=" + encodeURIComponent('"msg: ' + b + "; " + a + "#" + c + '"'))
-                    };
-                window.onerror = f;
-                QWait = function () {
-                    for (var b = arguments, a = b.length - 1, e = b[a], d = []; a--;) g.hasOwnProperty(b[a]) || d.push(b[a]);
-                    d.length ? c.push({
-                        labels: d,
-                        func: e
-                    }) : e()
-                };
-                QLoad = function (b) {
-                    var a, e, d, f;
-                    a = 0;
-                    for (e = c.length; a < e; a++) for (d = f = c[a].labels.length; d--;) if (c[a].labels[d] === b) {
-                                c[a].labels.splice(d, 1);
-                                if (1 === f) {
-                                    c.splice(a,
-                                        1)[0].func();
-                                    QLoad(b);
-                                    return
-                                }
-                                break
-                            }
-                    g[b] = 1
-                };
-                setTimeout(function () {
-                    var b = c.length,
-                        a = "";
-                    for (label in g) a += ", " + label;
-                    for (; b--;) f(c[b].labels.toString() + " UNFIRED; " + a.substr(2) + " DONE", "", "", "unfired_label")
-                }, 2E4);
-                window.onload = function () {
-                    QWait("quizlib", function () {
-                        QLoad("dom");
-                        QLoad("onload")
-                    })
-                }
-            })();
-        </script>
 
         <script src="http://d3js.org/d3.v3.min.js"></script>
         <script src="http://d3js.org/topojson.v0.min.js"></script>
         <script src="//ajax.googleapis.com/ajax/libs/jquery/2.0.0/jquery.min.js"></script>
         <script src="map.js"></script>
-
-        <script type="text/javascript">
-            HomepageMap.initialize();
-        </script>
     </head>
 
     <body>
         <div class="map">
-            <script>
-
-            var width = 960,
-                height = 960;
-
-            var projection = d3.geo.mercator()
-                .scale((width + 1) / 2 / Math.PI)
-                .translate([width / 2, height / 2])
-                .precision(.1);
-
-            var path = d3.geo.path()
-                .projection(projection);
-
-            var svg = d3.select("body").append("svg")
-                .attr("width", width)
-                .attr("height", height);
-
-            d3.json("world-50m.json", function(error, world) {
-              svg.insert("path")
-                  .datum(topojson.object(world, world.objects.land))
-                  .attr("class", "land")
-                  .attr("d", path);
-
-              svg.insert("path")
-                  .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
-                  .attr("class", "boundary")
-                  .attr("d", path);
-            });
-
-            d3.select(self.frameElement).style("height", height + "px");
-
+            <script type="text/javascript">
+                HomepageMap.initialize();
             </script>
             <div class="sessions" id="map-sessions"></div>
         </div>
