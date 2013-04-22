@@ -32,6 +32,18 @@ var HomepageMap = {
             $(this).parents(".session").removeClass("touching")
         })
     },
+    substitute: function (string, data, optRegex) {
+        return string.replace(optRegex || /\\?\{([^{}]+)\}/g, function (b, key) {
+            return "\\" == b.charAt(0) ?
+                b.slice(1) : null != data[key] ? data[key] : ""
+        })
+    },
+    getRandom: function (arr) {
+        if (arr.length)
+            return arr[Math.floor(Math.random()*arr.length)];
+        else
+            return null;
+    },
     refreshData: function () {
         $.ajax({
             url: "http://quizlet.com/homepage/map-activity/",
@@ -67,7 +79,7 @@ var HomepageMap = {
         if (!this.paused) {
             this.unhighlight();
             var eligSessions = $("#map-sessions .session").not(".showing").not(".remove");
-            this.nowShowing = $(eligSessions.toArray().getRandom()).addClass("showing")
+            this.nowShowing = $(this.getRandom(eligSessions.toArray())).addClass("showing")
         }
     },
     unhighlight: function () {
@@ -92,7 +104,8 @@ var HomepageMap = {
             };
         if (500 < projected[0])
             toSub.extraClasses = "flipped";
-        var rendered = $($.trim(this.sessionHtml).substitute(toSub)).css({
+        var rendered = $(this.substitute($.trim(this.sessionHtml), toSub));
+        rendered  = rendered.css({
             left: Math.round(projected[0] + 2 * (Math.random() - 0.5) - 2),
             top: Math.round(projected[1] + 2 * (Math.random() - 0.5) - 2)
         });
