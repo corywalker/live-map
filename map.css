@@ -25,6 +25,12 @@ body { margin: 0px; padding: 0px; }
   stroke-width: .5px;
 }
 
+.overlay{
+  fill: none;
+  stroke: #000;
+  stroke-width: 2px;
+}
+
 .map .sessions .session {
     display: block;
     position: absolute;

@@ -38,6 +38,13 @@ var HomepageMap = {
               .datum(topojson.mesh(world, world.objects.countries, function(a, b) { return a !== b; }))
               .attr("class", "boundary")
               .attr("d", path);
+
+            /*var daylight = {"type":"Feature","id":"34","properties":{"name":"Daylight"},"geometry":{"type":"LineString","coordinates":getDaylight()}};
+
+            svg.insert("path")
+                .datum(daylight)
+                .attr("class", "overlay")
+                .attr("d", path);*/
         });
 
         d3.select(self.frameElement).style("height", height + "px");
