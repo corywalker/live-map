@@ -7,13 +7,18 @@ var HomepageMap = {
     nowShowing: null,
     highlightLoop: 0,
     initialize: function () {
-        var width = 960,
-            height = 960;
+        var width = $(window).width();
+        var height = width;
+
+        var topCut = 0.177,
+            bottomCut = 0.6875;
+
+        var actualHeight = height * (bottomCut - topCut)
 
         this.projection = d3.geo.mercator()
             .scale((width + 1) / 2 / Math.PI)
-            .translate([width / 2, height / 2 - 170])
-            .clipExtent([[0,0],[960,660-170]])
+            .translate([width / 2, height / 2 - height * topCut])
+            .clipExtent([[0,0],[width,actualHeight]])
             .precision(.1);
 
         var path = d3.geo.path()
@@ -21,7 +26,7 @@ var HomepageMap = {
 
         var svg = d3.select("body").append("svg")
             .attr("width", width)
-            .attr("height", 660-170);
+            .attr("height", actualHeight);
 
         d3.json("world-50m.json", function(error, world) {
           svg.insert("path")
